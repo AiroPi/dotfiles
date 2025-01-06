@@ -1,6 +1,4 @@
-# Example
-
-```Dockerfile
+# ! Select the desired version
 FROM golang:1.21-alpine AS build
 WORKDIR /app
 RUN --mount=type=cache,target=/go/pkg/mod/ \
@@ -16,4 +14,3 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
 FROM scratch
 COPY --from=build /app/client /app/
 ENTRYPOINT [ "/app/main" ]
-```

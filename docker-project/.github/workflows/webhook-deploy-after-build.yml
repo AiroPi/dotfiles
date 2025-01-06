@@ -1,0 +1,28 @@
+name: Make an HTTP request to a webhook after a new image have been published
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    # ! Chose your trigger workflows
+    workflows: 
+      - "Build and Publish Docker Image"
+    # ! Chose your branches
+    branches: 
+      - "master"
+    types:
+      - completed
+
+jobs:
+  deploy-after-build:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Deploy
+        uses: fjogeleit/http-request-action@v1.16.3
+        with:
+          # ! DEPLOY_WEBHOOK_HOST needs to be added to the secrets
+          url: '${{secrets.DEPLOY_WEBHOOK_HOST}}/hooks/deploy'
+          method: 'POST'
+          customHeaders: '{"Content-Type": "application/json"}'
+          # ! DEPLOY_TOKEN needs to be added to the secrets
+          data: '{"token": "${{secrets.DEPLOY_TOKEN}}"}'

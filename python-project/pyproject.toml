@@ -1,41 +1,63 @@
-# https://docs.astral.sh/uv/concepts/projects/config/#configuring-projects
+# Docs:
+# - User friendly: https://packaging.python.org/en/latest/guides/writing-pyproject-toml/
+# - Technical: https://packaging.python.org/en/latest/specifications/core-metadata/#core-metadata
+# - Technical: https://packaging.python.org/en/latest/specifications/pyproject-toml/#declaring-project-metadata-the-project-table
+# - UV: https://docs.astral.sh/uv/concepts/projects/config/#configuring-projects
+#
+# Related examples:
+# - https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#a-full-example
 [project]
-name = "{PROJECT_NAME}"
-version = "{PROJECT_VERSION}"
-requires-python = ">={MINIMAL_PYTHON_VERSION}"
+name = "Hello World"
+version = "0.3.5b1"  # https://packaging.python.org/en/latest/specifications/version-specifiers/
+requires-python = ">=3.8"
 dependencies = [
-    #
-    "{DEPENDENCIES}",
+    # https://packaging.python.org/en/latest/specifications/dependency-specifiers/
+    "typing_extensions",
 ]
 
-# https://docs.astral.sh/uv/concepts/projects/config/#command-line-interfaces
+# Docs:
+# - User friendly: https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#creating-executable-scripts
+# - Technical: https://packaging.python.org/en/latest/specifications/entry-points/#entry-points
+# - UV: https://docs.astral.sh/uv/concepts/projects/config/#command-line-interfaces
 [project.scripts]
-{cli_command} = "{module.file:callable}"
+hello = "helloworld.__main__:app"
+
+# Docs:
+# - User friendly: https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#dependencies-optional-dependencies
+# - Technical: https://packaging.python.org/en/latest/specifications/dependency-specifiers/#dependency-specifiers
+# - UV: https://docs.astral.sh/uv/concepts/projects/dependencies/#optional-dependencies
+[project.optional-dependencies]
+cli = ["typer"]
 
 
-# https://hatch.pypa.io/latest/
-# Examples:
+# Docs:
+# - Technical: https://packaging.python.org/en/latest/specifications/dependency-groups/ 
+# - UV: https://docs.astral.sh/uv/concepts/projects/dependencies/#development-dependencies
+[dependency-groups]
+dev = [
+    { include-group = "lint" },
+    { include-group = "tox" },
+    "pytest",
+    "debugpy",
+]
+lint = ["pyright", "ruff"]
+tox = ["tox", "tox-uv"]
+
+# Docs:
+# - User friendly: https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#declaring-the-build-backend
+# - Technical: https://packaging.python.org/en/latest/specifications/pyproject-toml/#declaring-build-system-dependencies-the-build-system-table
+# - Hatchling: https://hatch.pypa.io/latest/
+#
+# Related examples:
 # - https://github.com/wirecraft-team/wirecraft/blob/main/pyproject.toml
 # - https://github.com/AiroPi/moneymanager/blob/master/pyproject.toml
+# - https://github.com/AiroPi/minesweeper/blob/master/pyproject.toml
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-
-# https://docs.astral.sh/uv/concepts/projects/
-[tool.uv]
-dev-dependencies = [
-    # "uv",
-    "pre-commit",
-    "pyright",
-    "debugpy",
-    "ruff",
-    "tox",
-    "tox-uv",
-]
-
-
-# https://microsoft.github.io/pyright/#/
+# Docs:
+# - pyright: https://microsoft.github.io/pyright/#/
 [tool.pyright]
 typeCheckingMode = "strict"
 
@@ -101,7 +123,6 @@ select = [
     # "DTZ",   # flake8-datetimez (TODO)
     # "B",     # flake8-bugbear
 ]
-
 ignore = [
     "E501", # line too long (we relate on the formater)
     "N818", # Error suffix for exceptions names
@@ -110,6 +131,16 @@ ignore = [
     "ISC001", # To avoid conflicts with the formatter
 ]
 dummy-variable-rgx = '^\*{0,2}(_$|__$|unused_|dummy_)'
+
+[tool.ruff.lint.extend-per-file-ignores]
+"tests/**/*.py" = [
+    "S101", # asserts allowed in tests...
+    "ARG",  # Unused function args -> fixtures nevertheless are functionally relevant...
+    "FBT",  # Don't care about booleans as positional arguments in tests, e.g. via @pytest.mark.parametrize()
+
+    "PLR2004", # Magic value used in comparison, ...
+    "S311",    # Standard pseudo-random generators are not suitable for cryptographic purposes
+]
 
 [tool.ruff.format]
 quote-style = "double"

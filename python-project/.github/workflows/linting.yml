@@ -1,37 +1,32 @@
+
 name: Check for style, typing, etc...
 
 on:
   push:
   pull_request:
 
+# Examples:
+# - https://github.com/AiroPi/readme-backend/blob/master/.github/workflows/lint.yml
+# - https://github.com/AiroPi/minesweeper/blob/master/.github/workflows/lint.yml
+
 jobs:
   check:
-    name: Execute test, check style, lint...
+    name: Execute tox (test, check style, lint...) for python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      # Disable matrix if you don't need it.
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
-      - name: Install uv
-        uses: astral-sh/setup-uv@v2
         with:
-            version: 0.4.0
-      - name: "Set up Python"
-        uses: actions/setup-python@v5
-        with:
-            python-version-file: "pyproject.toml"
-      - name: Install the project
-        run: uv sync --all-extras --dev
-      - name: Execute pyright
-        run: |
-            uv run pyright src/
-      - name: Execute ruff
-        run: |
-            uv run ruff format --check src/
-            uv run ruff check
-
-      # ! OR, if you have tox configured, simply use tox
-
-      - name: Execute tox
-        run: |
-            uv run tox
+          fetch-depth: 0
+      - name: Install latest version of uv
+        uses: astral-sh/setup-uv@v5
+      - name: Install tox
+        run: uv sync --only-group tox --frozen --python 3.13
+      - name: Run tox for python ${{ matrix.python-version }}
+        run: uv run tox -e py${{ matrix.python-version }}
 

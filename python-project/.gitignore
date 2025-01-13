@@ -1,0 +1,31 @@
+# Application
+
+# Environnement
+venv/
+.venv/
+.env
+
+# Tools
+.tox/
+.ruff_cache
+.pytest_cache
+
+# IDEs
+.vscode/**
+!.vscode/launch.json
+!.vscode/tasks.json
+
+.fleet/
+
+# Builds
+*.egg-info/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# MacOS
+**/.DS_Store
+
+# Exceptions
